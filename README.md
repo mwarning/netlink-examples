@@ -268,6 +268,7 @@ In this example, a user-space process sends a netlink message to the kernel modu
 #define MAX_PAYLOAD 1024  /* maximum payload size*/
 struct sockaddr_nl src_addr, dest_addr;
 struct nlmsghdr *nlh = NULL;
+struct msghdr msg;
 struct iovec iov;
 int sock_fd;
 
@@ -286,7 +287,7 @@ void main() {
   dest_addr.nl_pid = 0;   /* For Linux Kernel */
   dest_addr.nl_groups = 0; /* unicast */
 
-  nlh=(struct nlmsghdr *)malloc(
+  nlh = (struct nlmsghdr *)malloc(
              NLMSG_SPACE(MAX_PAYLOAD));
   /* Fill the netlink message header */
   nlh->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
@@ -302,12 +303,12 @@ void main() {
   msg.msg_iov = &iov;
   msg.msg_iovlen = 1;
 
-  sendmsg(fd, &msg, 0);
+  sendmsg(sock_fd, &msg, 0);
 
   /* Read message from kernel */
   memset(nlh, 0, NLMSG_SPACE(MAX_PAYLOAD));
-  recvmsg(fd, &msg, 0);
-  printf(" Received message payload: %s\n",
+  recvmsg(sock_fd, &msg, 0);
+  printf("Received message payload: %s\n",
   NLMSG_DATA(nlh));
 
   /* Close Netlink Socket */
@@ -320,8 +321,7 @@ And, here is the kernel code:
 ```
 struct sock *nl_sk = NULL;
 
-void nl_data_ready (struct sock *sk, int len)
-{
+void nl_data_ready(struct sock *sk, int len) {
   wake_up_interruptible(sk->sleep);
 }
 
@@ -374,11 +374,12 @@ In this example, two user-space applications are listening to the same netlink m
 #define MAX_PAYLOAD 1024  /* maximum payload size*/
 struct sockaddr_nl src_addr, dest_addr;
 struct nlmsghdr *nlh = NULL;
+struct msghdr msg;
 struct iovec iov;
 int sock_fd;
 
 void main() {
-  sock_fd=socket(PF_NETLINK, SOCK_RAW, NETLINK_TEST);
+  sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_TEST);
 
   memset(&src_addr, 0, sizeof(local_addr));
   src_addr.nl_family = AF_NETLINK;
@@ -404,8 +405,8 @@ void main() {
   printf("Waiting for message from kernel\n");
 
   /* Read message from kernel */
-  recvmsg(fd, &msg, 0);
-  printf(" Received message payload: %s\n",
+  recvmsg(sock_fd, &msg, 0);
+  printf("Received message payload: %s\n",
         NLMSG_DATA(nlh));
   close(sock_fd);
 }
@@ -417,6 +418,10 @@ And, here is the kernel code:
 #define MAX_PAYLOAD 1024
 struct sock *nl_sk = NULL;
 
+void nl_data_ready(struct sock *sk, int len) {
+  wake_up_interruptible(sk->sleep);
+}
+
 void netlink_test() {
   sturct sk_buff *skb = NULL;
   struct nlmsghdr *nlh;
@@ -424,7 +429,7 @@ void netlink_test() {
 
   nl_sk = netlink_kernel_create(NETLINK_TEST,
                                nl_data_ready);
-  skb=alloc_skb(NLMSG_SPACE(MAX_PAYLOAD),GFP_KERNEL);
+  skb = alloc_skb(NLMSG_SPACE(MAX_PAYLOAD),GFP_KERNEL);
   nlh = (struct nlmsghdr *)skb->data;
   nlh->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
   nlh->nlmsg_pid = 0;  /* from kernel */
