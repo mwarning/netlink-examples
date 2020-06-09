@@ -381,7 +381,7 @@ int sock_fd;
 void main() {
   sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_TEST);
 
-  memset(&src_addr, 0, sizeof(local_addr));
+  memset(&src_addr, 0, sizeof(src_addr));
   src_addr.nl_family = AF_NETLINK;
   src_addr.nl_pid = getpid();  /* self pid */
   /* interested in group 1<<0 */
