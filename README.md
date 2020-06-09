@@ -5,3 +5,5 @@ A somewhat outdated article [Why and How to Use Netlink Socket](articles/Why_and
 * [Netlink Unicast Example](unicast_example/)
 * [Netlink Multicast Example](multicast_example/)
 * [Netlink Unicast Example](unicast_network_namespace_example/) (Linux network namespace aware)
+
+These should work for Linux kernel versions >= 3.6.

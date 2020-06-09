@@ -18,11 +18,11 @@ static void netlink_test_recv_msg(struct sk_buff *skb)
     int res;
 
     nlh = (struct nlmsghdr *)skb->data;
+    pid = nlh->nlmsg_pid; /* pid of sending process */
     msg = (char *)nlmsg_data(nlh);
     msg_size = strlen(msg);
 
-    printk(KERN_INFO "netlink_test: Received %s\n", msg);
-    pid = nlh->nlmsg_pid; /* pid of sending process */
+    printk(KERN_INFO "netlink_test: Received from pid %d: %s\n", pid, msg);
 
     // create reply
     skb_out = nlmsg_new(msg_size, 0);
@@ -35,6 +35,8 @@ static void netlink_test_recv_msg(struct sk_buff *skb)
     nlh = nlmsg_put(skb_out, 0, 0, NLMSG_DONE, msg_size, 0);
     NETLINK_CB(skb_out).dst_group = 0; /* not in mcast group */
     strncpy(nlmsg_data(nlh), msg, msg_size);
+
+    printk(KERN_INFO "netlink_test: Send %s\n", msg);
 
     res = nlmsg_unicast(nl_sock, skb_out, pid);
     if (res < 0)

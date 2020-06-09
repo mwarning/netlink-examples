@@ -11,7 +11,7 @@
 #define NETLINK_TEST 17
 
 
-int main(void)
+int main(int argc, char **argv)
 {
   struct sockaddr_nl src_addr;
   struct sockaddr_nl dest_addr;
@@ -20,6 +20,11 @@ int main(void)
   struct iovec iov;
   int sock_fd;
   int rc;
+
+  if (argc != 2) {
+    printf("usage: %s <message>\n", argv[0]);
+    return 1;
+  }
 
   sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_TEST);
   if (sock_fd < 0) {
@@ -46,7 +51,7 @@ int main(void)
   nlh->nlmsg_flags = 0;
 
   /* Fill in the netlink message payload */
-  strcpy(NLMSG_DATA(nlh), "Hello you!");
+  strcpy(NLMSG_DATA(nlh), argv[1]);
 
   memset(&iov, 0, sizeof(iov));
   iov.iov_base = (void *)nlh;
@@ -58,9 +63,11 @@ int main(void)
   msg.msg_iov = &iov;
   msg.msg_iovlen = 1;
 
+  printf("Send to kernel: %s\n", argv[1]);
+
   rc = sendmsg(sock_fd, &msg, 0);
   if (rc < 0) {
-    printf("sendmsg: %s\n", strerror(errno));
+    printf("sendmsg(): %s\n", strerror(errno));
     close(sock_fd);
     return 1;
   }
@@ -70,12 +77,12 @@ int main(void)
 
   rc = recvmsg(sock_fd, &msg, 0);
   if (rc < 0) {
-    printf("sendmsg: %s\n", strerror(errno));
+    printf("sendmsg(): %s\n", strerror(errno));
     close(sock_fd);
     return 1;
   }
 
-  printf("Received message payload: %s\n", NLMSG_DATA(nlh));
+  printf("Received from kernel: %s\n", NLMSG_DATA(nlh));
 
   /* Close Netlink Socket */
   close(sock_fd);

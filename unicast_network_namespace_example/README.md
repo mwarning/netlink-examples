@@ -15,7 +15,7 @@ insmod ./netlink_test.ko
 Check kernel log `dmesg` for module debug output.
 
 ```
-./nl_recv
+./nl_recv "Hello you!"
 Hello you!
 ```
 
