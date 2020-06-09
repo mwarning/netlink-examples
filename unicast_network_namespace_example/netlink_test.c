@@ -1,11 +1,10 @@
-#include <linux/module.h>
 #include <net/sock.h>
-#include <linux/netlink.h>
-#include <linux/skbuff.h>
-
-#include <linux/pid_namespace.h>
 #include <net/netns/generic.h>
 #include <net/net_namespace.h>
+#include <linux/module.h>
+#include <linux/netlink.h>
+#include <linux/skbuff.h>
+#include <linux/pid_namespace.h>
 
 #define NETLINK_TEST 17
 
