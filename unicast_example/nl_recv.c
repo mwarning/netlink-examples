@@ -3,14 +3,16 @@
 #include <string.h>
 #include <unistd.h>
 #include <errno.h>
-#define NETLINK_TEST 17
 
 #include <sys/socket.h>
 #include <linux/netlink.h>
 
-#define MAX_PAYLOAD 1024  /* maximum payload size*/
+#define MAX_PAYLOAD 1024  /* maximum payload size */
+#define NETLINK_TEST 17
 
-int main(void) {
+
+int main(void)
+{
   struct sockaddr_nl src_addr;
   struct sockaddr_nl dest_addr;
   struct nlmsghdr *nlh;
@@ -42,6 +44,7 @@ int main(void) {
   nlh->nlmsg_len = NLMSG_SPACE(MAX_PAYLOAD);
   nlh->nlmsg_pid = getpid();  /* self pid */
   nlh->nlmsg_flags = 0;
+
   /* Fill in the netlink message payload */
   strcpy(NLMSG_DATA(nlh), "Hello you!");
 

@@ -11,7 +11,7 @@ make
 Load kernel module:
 
 ```
-insmod netlink_test.ko
+insmod ./netlink_test.ko
 ```
 
 Also check kernel log `dmesg` for module debug output.
