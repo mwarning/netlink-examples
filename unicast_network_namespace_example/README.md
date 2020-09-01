@@ -1,5 +1,8 @@
 # Netlink Unicast Example - Network Namespace Aware
 
+This kernel module does maintain its own state per Linux network namespace.
+The module here does not really expose any state, so read the source. :-)
+
 Compile kernel module and user space program.
 
 ```
