@@ -276,7 +276,7 @@ void main() {
   sock_fd = socket(PF_NETLINK, SOCK_RAW, NETLINK_TEST);
 
   memset(&src_addr, 0, sizeof(src_addr));
-  src__addr.nl_family = AF_NETLINK;
+  src_addr.nl_family = AF_NETLINK;
   src_addr.nl_pid = getpid();  /* self pid */
   src_addr.nl_groups = 0;  /* not in mcast groups */
   bind(sock_fd, (struct sockaddr*)&src_addr,
